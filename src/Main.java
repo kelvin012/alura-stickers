@@ -1,11 +1,16 @@
+import com.diogonunes.jcolor.Attribute;
+import com.google.gson.Gson;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.List;
-import java.util.Map;
+
+import static com.diogonunes.jcolor.Ansi.colorize;
+import static com.diogonunes.jcolor.Attribute.*;
+
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -21,18 +26,19 @@ public class Main {
 
         // extrair os dados que interessam (titulo, poster, classificação)
 
-        JsonParser jsonParser = new JsonParser();
-        List<Map<String, String>> listaDeFilmes = jsonParser.parse(body);
+        Gson gsonParser = new Gson();
+        ListaDeFilmes filmes = gsonParser.fromJson(body, ListaDeFilmes.class);
 
         // manipular e exibir os dados
 
-        for (Map<String, String> filme : listaDeFilmes) {
-            System.out.println(filme.get("title"));
-            System.out.println(filme.get("imDbRating"));
-            System.out.println(filme.get("image"));
-            System.out.println();
+        Attribute[] myFormat1 = new Attribute[]{BLACK_TEXT(), CYAN_BACK(), BOLD()};
+        Attribute[] myFormat2 = new Attribute[]{BRIGHT_CYAN_TEXT(), BOLD()};
+
+        for (Filme filme : filmes.getItems()) {
+            System.out.println(colorize("Nome: " + filme.getTitle(), myFormat1));
+            System.out.println(colorize("Capa[url]: ", myFormat2) + filme.getImage());
+            System.out.println(colorize("Nota: " + filme.getImDbRating(),myFormat2));
+            System.out.println("\n");
         }
-
-
     }
 }
